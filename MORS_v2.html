@@ -656,21 +656,7 @@ body {
     </div>
   </div>
 
-  <div class="seksjon">
-    <div class="seksjon-header"><h2>👨‍👩‍👧 Pårørende</h2></div>
-    <div class="seksjon-body">
-      <div class="felt-rad">
-        <div class="felt">
-          <label>Navn</label>
-          <input type="text" id="paarorendeNavn" placeholder="Fullt navn">
-        </div>
-        <div class="felt">
-          <label>Telefon</label>
-          <input type="tel" id="paarorendeTlf" placeholder="Telefonnummer">
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <div class="seksjon">
     <div class="seksjon-header"><h2>✅ Status på stedet</h2></div>
@@ -754,9 +740,19 @@ body {
   <div class="seksjon">
     <div class="seksjon-header"><h2>📝 Notater og eiendeler</h2></div>
     <div class="seksjon-body">
-      <div class="felt">
-        <label>Pårørende varslet av — Navn og tlf</label>
-        <input type="text" id="paarorendeVarsletAv" placeholder="Navn, telefonnummer">
+      <div class="felt-rad">
+        <div class="felt">
+          <label>Pårørende navn og tlf</label>
+          <input type="text" id="paarorendeNavn" placeholder="Navn, telefonnummer">
+        </div>
+        <div class="felt">
+          <label>Pårørende varslet</label>
+          <div class="jn-gruppe">
+            <button class="jn-knapp" id="jn_paarorendeVarslet_ja" onclick="setJN('paarorendeVarslet','ja')" type="button">✓ Ja</button>
+            <button class="jn-knapp nei" id="jn_paarorendeVarslet_nei" onclick="setJN('paarorendeVarslet','nei')" type="button">✗ Nei</button>
+          </div>
+          <input type="hidden" id="paarorendeVarslet" value="nei">
+        </div>
       </div>
       <div class="felt">
         <label>Mottatte eiendeler</label>
@@ -772,19 +768,7 @@ body {
     </div>
   </div>
 
-  <div class="seksjon">
-    <div class="seksjon-header"><h2>📧 Send til</h2></div>
-    <div class="seksjon-body">
-      <div class="mottaker-badges" id="mottakerBadges">
-        <button class="mottaker-badge" data-email="oushfpbefo@ous-hf.no" onclick="toggleBadge(this)" type="button"><div class="badge-ikon">+</div>OUS</button>
-        <button class="mottaker-badge" data-email="ole.setsaas@fonus.no" onclick="toggleBadge(this)" type="button"><div class="badge-ikon">+</div>Ole Setsaas</button>
-        <button class="mottaker-badge" data-email="regnskap@byravakten.no" onclick="toggleBadge(this)" type="button"><div class="badge-ikon">+</div>Regnskap BV</button>
-        <button class="mottaker-badge" data-email="regnskap@fonus.no" onclick="toggleBadge(this)" type="button"><div class="badge-ikon">+</div>Regnskap Fonus</button>
-      </div>
-      <div class="mottaker-liste" id="mottakerListe"></div>
-      <button class="legg-til-knapp" onclick="leggTilMottaker()" type="button">＋ Legg til e-postadresse</button>
-    </div>
-  </div>
+
 
   <div class="send-area">
     <button class="send-knapp" onclick="genererPDF()" type="button">📄 Generer og send PDF</button>
@@ -837,12 +821,13 @@ function visHistorikk() {
 
 // ===== JA/NEI =====
 function setJN(felt, val) {
-  const feltId = { paarorende:'paarorendeVenter', legeVenter:'legeVenter', politiVenter:'politiVenter', legeVentes:'legeVentes', dodsattest:'doedsattestSkrevet' };
-  document.getElementById(feltId[felt]).value = val;
+  const feltId = { paarorende:'paarorendeVenter', legeVenter:'legeVenter', politiVenter:'politiVenter', legeVentes:'legeVentes', dodsattest:'doedsattestSkrevet', paarorendeVarslet:'paarorendeVarslet' };
+  const el = document.getElementById(feltId[felt]);
+  if (el) el.value = val;
   const ja = document.getElementById('jn_'+felt+'_ja');
   const nei = document.getElementById('jn_'+felt+'_nei');
-  ja.className = 'jn-knapp' + (val==='ja' ? ' ja' : '');
-  nei.className = 'jn-knapp' + (val==='nei' ? ' nei' : '');
+  if (ja) ja.className = 'jn-knapp' + (val==='ja' ? ' ja' : '');
+  if (nei) nei.className = 'jn-knapp' + (val==='nei' ? ' nei' : '');
 }
 
 // ===== AVKRYSSING =====
@@ -877,7 +862,7 @@ function leggTilMottaker() {
   div.className = 'mottaker-rad';
   div.id = 'rad_'+id;
   div.innerHTML = '<input type="email" id="'+id+'" placeholder="epost@eksempel.no" inputmode="email"><button class="fjern-knapp" onclick="fjernMottaker(\'rad_'+id+'\')" type="button">×</button>';
-  document.getElementById('mottakerListe').appendChild(div);
+  const ml = document.getElementById('mottakerListe'); if(ml) ml.appendChild(div);
   document.getElementById(id).focus();
   document.getElementById(id).addEventListener('blur', lagreMottakere);
 }
@@ -899,7 +884,7 @@ function lastMottakere() {
       const div = document.createElement('div');
       div.className = 'mottaker-rad'; div.id = 'rad_'+id;
       div.innerHTML = '<input type="email" id="'+id+'" value="'+email+'" inputmode="email"><button class="fjern-knapp" onclick="fjernMottaker(\'rad_'+id+'\')" type="button">×</button>';
-      document.getElementById('mottakerListe').appendChild(div);
+      const ml = document.getElementById('mottakerListe'); if(ml) ml.appendChild(div);
       document.getElementById(id).addEventListener('blur', lagreMottakere);
     });
   } catch(err) {}
@@ -918,7 +903,6 @@ function hentData() {
     rekvirentTlf: v('rekvirentTlf'), rekvirentEpost: v('rekvirentEpost'),
     annenVenteInfo: v('annenVenteInfo'),
     paarorendeNavn: v('paarorendeNavn'),
-    paarorendeTlf: v('paarorendeTlf'),
     paarorendeVenter: document.getElementById('paarorendeVenter')?.value || 'nei',
     legeVenter: document.getElementById('legeVenter')?.value || 'nei',
     politiVenter: document.getElementById('politiVenter')?.value || 'nei',
@@ -928,7 +912,7 @@ function hentData() {
     avlastning: cbkState.avlastning, rettslig: cbkState.rettslig,
     eierbyraa: cbkState.eierbyraa, donor: cbkState.donor,
     eiendelAktiv: eiendelAktiv,
-    paarorendeVarsletAv: v('paarorendeVarsletAv'),
+    paarorendeVarslet: document.getElementById('paarorendeVarslet')?.value || 'nei',
     diverseOpplysninger: v('diverseOpplysninger'),
   };
 }
@@ -1004,7 +988,8 @@ function visDetalj(idx) {
     ['Rettslig', o.rettslig?'Ja':null],
     ['Donor', o.donor?'Ja':null],
     ['Eiendeler', o.eiendelAktiv?'Ja':'Nei'],
-    ['Pårørende varslet', o.paarorendeVarsletAv],
+    ['Pårørende navn/tlf', o.paarorendeNavn],
+    ['Pårørende varslet', o.paarorendeVarslet],
     ['Diverse', o.diverseOpplysninger],
   ];
 
@@ -1076,7 +1061,6 @@ Venteinfo:         ${d(o.annenVenteInfo)}
 
 PÅRØRENDE
 Navn:              ${d(o.paarorendeNavn)}
-Telefon:           ${d(o.paarorendeTlf)}
 
 STATUS
 Pårørende venter:  ${(o.paarorendeVenter||'nei').toUpperCase()}
@@ -1087,7 +1071,8 @@ Lege ventes:       ${(o.legeVentes||'nei').toUpperCase()}
 ${checks.length>0?checks.map(c=>'☑ '+c).join('\n'):''}
 
 NOTATER
-Pårørende varslet: ${d(o.paarorendeVarsletAv)}
+Pårørende navn/tlf: ${d(o.paarorendeNavn)}
+Pårørende varslet: ${(o.paarorendeVarslet||'nei').toUpperCase()}
 Eiendeler:         ${o.eiendelAktiv?'JA':'NEI'}
 Diverse:           ${d(o.diverseOpplysninger)}
 
@@ -1276,9 +1261,15 @@ function genererPDFFraData(o, callback) {
   doc.setDrawColor(0,0,0);doc.setLineWidth(0.5);
   doc.rect(lCol,y-6,rg-lCol,9,'S');
   doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(0,0,0);
-  doc.text('P\u00e5r\u00f8rende varslet av',lCol+2,y-2);
-  doc.setFont('helvetica','normal');doc.text('Navn:',lCol+42,y-2);
-  if(dv(o.paarorendeVarsletAv)) doc.text(dv(o.paarorendeVarsletAv),lCol+54,y-2);
+  doc.text('P\u00e5r\u00f8rende',lCol+2,y-2);
+  doc.setFont('helvetica','normal');
+  doc.text('Navn/tlf:',lCol+28,y-2);
+  if(dv(o.paarorendeNavn)) doc.text(dv(o.paarorendeNavn),lCol+50,y-2);
+  var pvJa=(o.paarorendeVarslet||'nei')==='ja';
+  doc.text('Varslet:',rg-40,y-2);
+  doc.setFont('helvetica','bold');
+  doc.setTextColor(pvJa?22:180,pvJa?140:50,pvJa?50:50);
+  doc.text(pvJa?'JA':'NEI',rg-18,y-2);
   y+=11;
 
   doc.setFontSize(8);doc.setFont('helvetica','bold');doc.setTextColor(0,0,0);
@@ -1313,7 +1304,7 @@ function genererPDFFraData(o, callback) {
 function nullstillSkjema() {
   ['oppdragstidspunkt','oppdragssted','oppdragsadresse','poststed','adressebeskrivelse',
    'transportTil','avdoedesNavn','foedtDato','refnr','rekvirent','rekvirentVed',
-   'rekvirentTlf','rekvirentEpost','annenVenteInfo','paarorendeNavn','paarorendeTlf','paarorendeVarsletAv','diverseOpplysninger'].forEach(id=>{
+   'rekvirentTlf','rekvirentEpost','annenVenteInfo','paarorendeNavn','diverseOpplysninger'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
   });
@@ -1323,7 +1314,7 @@ function nullstillSkjema() {
   const hh=String(n.getHours()).padStart(2,'0'), mm=String(n.getMinutes()).padStart(2,'0');
   document.getElementById('oppdragstidspunkt').value=dd+'.'+mo+'.'+yy+' '+hh+':'+mm;
 
-  ['paarorende','legeVenter','politiVenter','legeVentes','dodsattest'].forEach(f=>setJN(f,'nei'));
+  ['paarorende','legeVenter','politiVenter','legeVentes','dodsattest','paarorendeVarslet'].forEach(f=>setJN(f,'nei'));
 
   Object.keys(cbkState).forEach(k=>{
     cbkState[k]=false;
@@ -1343,7 +1334,7 @@ function nullstillSkjema() {
     b.querySelector('.badge-ikon').textContent='+';
   });
 
-  document.getElementById('mottakerListe').innerHTML='';
+  const ml2 = document.getElementById('mottakerListe'); if(ml2) ml2.innerHTML='';
 }
 
 function nullstill() {
