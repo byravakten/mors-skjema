@@ -763,7 +763,7 @@ body {
       </div>
       <div class="felt">
         <label>Diverse opplysninger / Hentet av</label>
-        <textarea id="diverseOpplysninger" placeholder="Eks: Hentet av X og Y kl. 12:00"></textarea>
+        <textarea id="diverseOpplysninger" placeholder="Eks: Hentet av X og Y kl. 12:00. Postnummer: XXXX"></textarea>
       </div>
     </div>
   </div>
@@ -1176,12 +1176,11 @@ function genererPDFFraData(o, callback) {
   doc.setCharSpace(0.8); doc.text('OSLO N\u00d8YTRALE BYR\u00c5VAKT AS',mg,21); doc.setCharSpace(0);
   doc.setDrawColor(0,0,0); doc.setLineWidth(0.4); doc.line(mg,23,mg+58,23);
 
-  const kontakt=[['TIL','Oslo N\u00f8ytrale Byr\u00e5vakt As'],['Fax','22654469'],['E-post','vaktbil@byravakten.no'],['Telefon','91180820 / 22086070']];
   doc.setFontSize(8);
-  kontakt.forEach((r,i)=>{
-    doc.setFont('helvetica','bold'); doc.text(r[0],mg,30+i*5);
-    doc.setFont('helvetica','normal'); doc.text(r[1],mg+18,30+i*5);
-  });
+  doc.setFont('helvetica','bold'); doc.text('E-post',mg,30);
+  doc.setFont('helvetica','normal'); doc.text('vaktbil@byravakten.no',mg+18,30);
+  doc.setFont('helvetica','bold'); doc.text('Telefon',mg,35);
+  doc.setFont('helvetica','normal'); doc.text('91180820 / 22086070',mg+18,35);
 
   doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(0,0,0);
   doc.text('MORS',mg,58);
